@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="App" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.api_rest.jpa_repository.JpaRepositoryApplication" />
+    <module name="jpa_repository" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

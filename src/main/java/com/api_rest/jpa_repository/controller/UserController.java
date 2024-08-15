@@ -3,12 +3,16 @@ package com.api_rest.jpa_repository.controller;
 import com.api_rest.jpa_repository.model.dto.UserDTO;
 import com.api_rest.jpa_repository.model.entity.User;
 import com.api_rest.jpa_repository.service.impl.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -38,14 +42,21 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO> save(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> save(@Valid @RequestBody UserDTO userDTO, BindingResult result) {
+        if(result.hasFieldErrors()){
+            return validation(result);
+        }
         User user = convertToEntity(userDTO);
         User savedUser = userService.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(convertToDTO(savedUser));
     }
 
+
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userDTO, @PathVariable Long id) {
+    public ResponseEntity<?> updateUser(@Valid @RequestBody UserDTO userDTO, BindingResult result , @PathVariable Long id) {
+        if(result.hasFieldErrors()){
+            return validation(result);
+        }
         return userService.findById(id)
                 .map(existingUser -> {
                     existingUser.setName(userDTO.getName());
@@ -64,6 +75,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    //Metodo para convertir DTO y Entity
     private UserDTO convertToDTO(User user) {
         return UserDTO.builder()
                 .id(user.getId())
@@ -78,5 +90,14 @@ public class UserController {
                 .name(userDTO.getName())
                 .lastName(userDTO.getLastName())
                 .build();
+    }
+
+    //Metodo de validation
+    private ResponseEntity<?> validation(BindingResult result) {
+        Map<String, String> errors = new HashMap<>();
+        result.getFieldErrors().forEach(err -> {
+            errors.put(err.getField(), "El campo" + err.getField() + " " + err.getDefaultMessage());
+        });
+        return ResponseEntity.badRequest().body(errors);
     }
 }
