@@ -4,6 +4,9 @@ import com.api_rest.jpa_repository.model.dto.UserDTO;
 import com.api_rest.jpa_repository.model.entity.User;
 import com.api_rest.jpa_repository.service.impl.UserService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -44,7 +47,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<?> save(@Valid @RequestBody UserDTO userDTO, BindingResult result) {
         if(result.hasFieldErrors()){
-            return validation(result);
+            return validateBindingResult(result);
         }
         User user = convertToEntity(userDTO);
         User savedUser = userService.save(user);
@@ -55,7 +58,7 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@Valid @RequestBody UserDTO userDTO, BindingResult result , @PathVariable Long id) {
         if(result.hasFieldErrors()){
-            return validation(result);
+            return validateBindingResult(result);
         }
         return userService.findById(id)
                 .map(existingUser -> {
@@ -92,12 +95,22 @@ public class UserController {
                 .build();
     }
 
-    //Metodo de validation
-    private ResponseEntity<?> validation(BindingResult result) {
+  /* //Metodo de validation
+    private ResponseEntity<?> validateBindingResult(BindingResult result) {
         Map<String, String> errors = new HashMap<>();
         result.getFieldErrors().forEach(err -> {
-            errors.put(err.getField(), "El campo" + err.getField() + " " + err.getDefaultMessage());
+            errors.put(err.getField(), "El campo " + err.getField() + " " + err.getDefaultMessage());
+        });
+        return ResponseEntity.badRequest().body(errors);
+    }*/
+
+    private ResponseEntity<?> validateBindingResult(BindingResult result) {
+        Map<String, String> errors = new HashMap<>();
+        result.getFieldErrors().forEach(err -> {
+            errors.put(err.getField(), "El campo " + err.getField() + " " + err.getDefaultMessage());
         });
         return ResponseEntity.badRequest().body(errors);
     }
+
+
 }

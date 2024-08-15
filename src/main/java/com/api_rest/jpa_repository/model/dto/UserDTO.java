@@ -15,10 +15,10 @@ public class UserDTO {
 
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "{NotBlank.userDTO.name}")
     @Size(min=3, max=50)
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "{NotBlank.userDTO.lastName}")
     private String lastName;
 }
