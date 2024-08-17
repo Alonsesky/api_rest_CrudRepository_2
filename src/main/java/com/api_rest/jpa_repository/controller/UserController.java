@@ -3,10 +3,9 @@ package com.api_rest.jpa_repository.controller;
 import com.api_rest.jpa_repository.model.dto.UserDTO;
 import com.api_rest.jpa_repository.model.entity.User;
 import com.api_rest.jpa_repository.service.impl.UserService;
+import com.api_rest.jpa_repository.validator.UserValidation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -21,6 +20,9 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/user")
 public class UserController {
+
+    @Autowired
+    UserValidation validation;
 
     private final UserService userService;
 
@@ -46,6 +48,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<?> save(@Valid @RequestBody UserDTO userDTO, BindingResult result) {
+        validation.validate(userDTO,result);
         if(result.hasFieldErrors()){
             return validateBindingResult(result);
         }
@@ -57,6 +60,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@Valid @RequestBody UserDTO userDTO, BindingResult result , @PathVariable Long id) {
+        validation.validate(userDTO,result);
         if(result.hasFieldErrors()){
             return validateBindingResult(result);
         }
